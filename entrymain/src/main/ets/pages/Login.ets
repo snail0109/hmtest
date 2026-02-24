@@ -28,7 +28,9 @@ struct Login {
   @State password: string = ''
   @State message: string = ''
   @State loginCodeText: string = ''
+  @State enableCodeButton: boolean = true
   private timerId: number = 0
+  private countdown: number = 60
   private WebRootUrl: string = ''
   private WebKey: string = ''
 
@@ -84,11 +86,11 @@ struct Login {
         .margin({ bottom: 16 })
 
 
-      Text('密码')
+      Text('动态口令')
         .margin({ bottom: 8 })
         .alignSelf(ItemAlign.Start)
       Row() {
-        TextInput({ placeholder: '请输入密码', text: '734239' })
+        TextInput({ placeholder: '请动态口令', text: '734239' })
           .onChange((value: string) => {
             this.password = value
           })
@@ -103,8 +105,8 @@ struct Login {
           .onClick(() => this.login())
           .margin({ top: 16 })
           .alignSelf(ItemAlign.Start)
-        Button('获取动态码')
-          .enabled(this.timerId === 0)
+        Button('获取动态口令')
+          .enabled(this.enableCodeButton)
           .margin({ left: 20, top: 16 })
           .onClick(() => {
             this.getDynamicCode()
@@ -121,9 +123,10 @@ struct Login {
             .margin({ top: 16 })
         }
       }
-    }.width('40%')
+    }.width('50%')
     .height('50%')
-    .padding(24)
+    .padding(40)
+    .margin({ left: 'auto', right: 'auto' })
   }
 
   private getDynamicCode(): void {
@@ -150,12 +153,17 @@ struct Login {
       console.log("调用get_login_code_robot成功", (res.result ?? '').toString())
       try {
         this.message = (res.result ?? '').toString()
-        let ct = 60
+        this.enableCodeButton = false
+        let ct = this.countdown
         this.loginCodeText = `${ct}s后重新发送`
         this.timerId = setInterval(() => {
           ct -= 1
+          if (ct <= 50) {
+            this.enableCodeButton = true
+          }
           if (ct <= 0) {
-            this.loginCodeText = '获取动态码'
+            this.loginCodeText = ''
+            this.enableCodeButton = true
             clearInterval(this.timerId)
             this.timerId = 0
           } else {
@@ -166,7 +174,7 @@ struct Login {
         console.error("处理响应数据时出错:", error)
       }
     }).catch((_err: Error) => {
-      this.message = '获取令牌失败'
+      this.message = '获取动态口令失败'
       this.loginCodeText = ''
     }).finally(() => {
       try {
@@ -184,7 +192,7 @@ struct Login {
       return
     }
     if (!p) {
-      this.message = '密码/安全令牌不能为空'
+      this.message = '动态口令不能为空'
       return
     }
     const body = `${encodeURIComponent(this.WebKey)}&staff_code=${u}&pass_word=${p}`
@@ -220,19 +228,5 @@ struct Login {
       } catch {
       }
     })
-  }
-
-  private composeRedirectUrl(base: string, code: string): string {
-    let url = base
-    const hasHttp = url.toLowerCase().indexOf('http') === 0
-    if (hasHttp) {
-      if (url.indexOf('{code}') >= 0) {
-        url = url.replace(/\{code\}/g, code)
-      } else {
-        url = url + (url.indexOf('?') < 0 ? `?code=${code}` : `&code=${code}`)
-      }
-    }
-    url = url + (url.indexOf('?') < 0 ? `?language=zh_CN` : `&language=zh_CN`)
-    return url
   }
 }
