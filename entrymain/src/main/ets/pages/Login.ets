@@ -123,6 +123,19 @@ struct Login {
             .margin({ top: 16 })
         }
       }
+
+      // SSH登录按钮
+      Button('SSH远程登录')
+        .width('100%')
+        .height(45)
+        .backgroundColor('#1890ff')
+        .fontColor('#ffffff')
+        .margin({ top: 30 })
+        .onClick(() => {
+          router.pushUrl({
+            url: 'pages/SSHLogin'
+          })
+        })
     }.width('50%')
     .height('50%')
     .padding(40)

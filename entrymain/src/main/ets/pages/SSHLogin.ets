@@ -1,14 +1,17 @@
+import router from '@ohos.router';
+
 @Entry
 @Component
 struct SSHLogin {
-  @State host: string = ''
+  @State host: string = '192.168.100.1'
   @State port: string = '22'
-  @State username: string = ''
-  @State password: string = ''
+  @State username: string = 'root'
+  @State password: string = '7f2668'
   @State isConnecting: boolean = false
   @State connectionStatus: string = '未连接'
   @State terminalContent: string = ''
   @State showTerminal: boolean = false
+  @State inputCommand: string = ''
 
   build() {
     Column() {
@@ -36,7 +39,6 @@ struct SSHLogin {
               .fontSize(16)
               .width('30%')
             TextInput({ text: this.host })
-              .placeholder('请输入主机IP或域名')
               .width('70%')
               .onChange((value: string) => {
                 this.host = value
@@ -51,7 +53,6 @@ struct SSHLogin {
               .fontSize(16)
               .width('30%')
             TextInput({ text: this.port })
-              .placeholder('默认22')
               .width('70%')
               .onChange((value: string) => {
                 this.port = value
@@ -66,7 +67,6 @@ struct SSHLogin {
               .fontSize(16)
               .width('30%')
             TextInput({ text: this.username })
-              .placeholder('请输入用户名')
               .width('70%')
               .onChange((value: string) => {
                 this.username = value
@@ -81,7 +81,6 @@ struct SSHLogin {
               .fontSize(16)
               .width('30%')
             TextInput({ text: this.password })
-              .placeholder('请输入密码')
               .type(InputType.Password)
               .width('70%')
               .onChange((value: string) => {
@@ -136,7 +135,12 @@ struct SSHLogin {
         .padding(20)
         .backgroundColor('#ffffff')
         .borderRadius(10)
-        .shadow({ radius: 10, color: '#000000', offsetX: 2, offsetY: 2 })
+        .shadow({
+          radius: 10,
+          color: '#000000',
+          offsetX: 2,
+          offsetY: 2
+        })
         .margin({ top: 20 })
       }
 
@@ -183,19 +187,23 @@ struct SSHLogin {
 
           // 终端输入区域
           Row() {
-            TextInput({ text: '' })
-              .placeholder('输入命令...')
+            TextInput({ text: this.inputCommand })
               .width('80%')
               .backgroundColor('#2d2d2d')
               .fontColor('#ffffff')
-              .onSubmit((value: string) => {
-                this.sendCommand(value)
+              .onChange((value: string) => {
+                this.inputCommand = value
+              })
+              .onSubmit(() => {
+                this.sendCommand(this.inputCommand)
+                this.inputCommand = ''
               })
             Button('发送')
               .width('20%')
               .height(40)
               .onClick(() => {
-                // 发送命令逻辑
+                this.sendCommand(this.inputCommand)
+                this.inputCommand = ''
               })
           }
           .width('100%')
@@ -217,11 +225,15 @@ struct SSHLogin {
           router.back()
         })
     }
-    .width('100%')
+    .width('100.00%')
     .height('100%')
     .backgroundColor('#fafafa')
-    .padding({ left: 20, right: 20 })
+    .padding({ left: 40, right: 40 })
+    .alignSelf(ItemAlign.Center)
+    .justifyContent(FlexAlign.Start)
   }
+
+
 
   // SSH连接方法
   private connectSSH(): void {
@@ -252,11 +264,13 @@ struct SSHLogin {
 
   // 发送命令
   private sendCommand(command: string): void {
-    if (!command.trim()) return
+    if (!command.trim()) {
+      return
+    }
 
     // 添加命令到终端显示
     this.terminalContent += `${command}\n`
-    
+
     // 模拟命令执行结果
     setTimeout(() => {
       this.terminalContent += `命令执行结果: ${command}\n$ `
