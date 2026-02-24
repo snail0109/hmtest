@@ -92,6 +92,10 @@ struct Login {
         if (url) {
           this.WebRootUrl = url
         }
+        const code = typeof cfg['DefaultLoginCode'] === 'string' ? cfg['DefaultLoginCode'] as string : ''
+        if (code) {
+          this.username = code
+        }
       }).catch(() => {})
     } catch {}
   }
