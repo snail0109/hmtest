@@ -1,0 +1,55 @@
+{
+  "module": {
+    "name": "entrymain",
+    "type": "entry",
+    "description": "$string:module_desc",
+    "mainElement": "EntrymainAbility",
+    "deviceTypes": [
+      "2in1"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:main_pages",
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET"
+      }
+    ],
+    "abilities": [
+      {
+        "name": "EntrymainAbility",
+        "srcEntry": "./ets/entrymainability/EntrymainAbility.ets",
+        "description": "$string:EntrymainAbility_desc",
+        "icon": "$media:layered_image",
+        "label": "$string:EntrymainAbility_label",
+        "startWindowIcon": "$media:startIcon",
+        "startWindowBackground": "$color:start_window_background",
+        "exported": true,
+        "skills": [
+          {
+            "entities": [
+              "entity.system.home"
+            ],
+            "actions": [
+              "ohos.want.action.home"
+            ]
+          }
+        ]
+      }
+    ],
+    "extensionAbilities": [
+      {
+        "name": "EntrymainBackupAbility",
+        "srcEntry": "./ets/entrymainbackupability/EntrymainBackupAbility.ets",
+        "type": "backup",
+        "exported": false,
+        "metadata": [
+          {
+            "name": "ohos.extension.backup",
+            "resource": "$profile:backup_config"
+          }
+        ],
+      }
+    ]
+  }
+}
